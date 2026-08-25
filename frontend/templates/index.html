@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Smart Expense Tracker AI</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+</head>
+
+<body>
+
+
+<!-- =========================================
+     HEADER / NAVBAR
+========================================= -->
+
+<header>
+
+    <div class="logo">
+        <h2>💰 Smart Expense Tracker AI</h2>
+    </div>
+
+    <nav>
+        <ul>
+
+            <li>
+                <a href="{{ url_for('dashboard') }}" class="nav-btn">
+                    📈 Dashboard
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ url_for('reports') }}" class="nav-btn">
+                    📊 Reports
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ url_for('budget') }}" class="nav-btn">
+                    🎯 Budget
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ url_for('upload_statement_page') }}" class="nav-btn">
+                    🏦 Import
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ url_for('ai') }}" class="nav-btn">
+                    🤖 AI Assistant
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ url_for('logout') }}" class="logout-btn">
+                    🚪 Logout
+                </a>
+            </li>
+
+        </ul>
+    </nav>
+
+</header>
+
+
+<!-- =========================================
+     HERO SECTION
+========================================= -->
+
+<main class="hero">
+
+    <div class="hero-content">
+
+        <span class="badge">
+            🚀 AI Powered Finance Tracker
+        </span>
+
+        <h1>
+            Track Every Rupee <br>
+            Automatically.
+        </h1>
+
+        <p>
+            Welcome {{ fullname }}.
+            Track your income, expenses, budgets,
+            reports and smart financial insights
+            from one secure dashboard.
+        </p>
+
+        <div class="hero-buttons">
+
+            <a
+                href="{{ url_for('add_expense_page') }}"
+                class="expense-btn"
+            >
+                ➕ Add Expense
+            </a>
+
+            <a
+                href="{{ url_for('add_income_page') }}"
+                class="btn-secondary"
+            >
+                💰 Add Income
+            </a>
+
+            <a
+                href="{{ url_for('upload_statement_page') }}"
+                class="btn-secondary"
+            >
+                🏦 Import Statement
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <div class="hero-dashboard">
+
+        <div class="dashboard-card">
+
+            <h3>
+                Dashboard Preview
+            </h3>
+
+            <div class="card-row">
+
+                <span>
+                    Total Income
+                </span>
+
+                <strong>
+                    ₹{{ "{:,.0f}".format(income|float) }}
+                </strong>
+
+            </div>
+
+
+            <div class="card-row">
+
+                <span>
+                    Total Expense
+                </span>
+
+                <strong>
+                    ₹{{ "{:,.0f}".format(expenses|float) }}
+                </strong>
+
+            </div>
+
+
+            <div class="card-row">
+
+                <span>
+                    Savings
+                </span>
+
+                <strong>
+
+                    {% if savings < 0 %}
+
+                        -₹{{ "{:,.0f}".format((savings * -1)|float) }}
+
+                    {% else %}
+
+                        ₹{{ "{:,.0f}".format(savings|float) }}
+
+                    {% endif %}
+
+                </strong>
+
+            </div>
+
+
+            <a
+                href="{{ url_for('dashboard') }}"
+                class="btn-primary"
+            >
+                View Dashboard
+            </a>
+
+        </div>
+
+    </div>
+
+</main>
+
+
+<!-- =========================================
+     FEATURES SECTION
+========================================= -->
+
+<section class="features">
+
+    <h2>
+        Why Choose Smart Expense Tracker AI?
+    </h2>
+
+    <div class="feature-container">
+
+
+        <div class="feature-card">
+
+            <div class="icon">
+                🧾
+            </div>
+
+            <h3>
+                Expense Tracking
+            </h3>
+
+            <p>
+                Add and organize expenses using category,
+                amount, description and transaction date.
+            </p>
+
+        </div>
+
+
+        <div class="feature-card">
+
+            <div class="icon">
+                🤖
+            </div>
+
+            <h3>
+                AI Expense Analysis
+            </h3>
+
+            <p>
+                AI categorizes your expenses and
+                provides smart financial insights.
+            </p>
+
+        </div>
+
+
+        <div class="feature-card">
+
+            <div class="icon">
+                📊
+            </div>
+
+            <h3>
+                Smart Reports
+            </h3>
+
+            <p>
+                View beautiful daily, weekly,
+                monthly and yearly expense reports.
+            </p>
+
+        </div>
+
+
+        <div class="feature-card">
+
+            <div class="icon">
+                🎯
+            </div>
+
+            <h3>
+                Budget Planner
+            </h3>
+
+            <p>
+                Set budgets and receive alerts
+                before exceeding your spending limit.
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================
+     LIVE DASHBOARD PREVIEW
+========================================= -->
+
+<section class="dashboard-preview-section">
+
+    <h2>
+        Live Dashboard Preview
+    </h2>
+
+
+    <div class="dashboard-preview">
+
+
+        <div class="preview-header">
+
+            <h3>
+                Monthly Expense
+            </h3>
+
+            <span>
+                ₹{{ "{:,.0f}".format(expenses|float) }}
+            </span>
+
+        </div>
+
+
+        <div class="progress-bar">
+
+            <div
+                class="progress-fill"
+                style="
+                    width:
+                    {% if income|float > 0 %}
+                        {{ [((expenses|float / income|float) * 100), 100] | min }}%
+                    {% else %}
+                        0%
+                    {% endif %}
+                "
+            ></div>
+
+        </div>
+
+
+        <h3 class="transaction-title">
+            Recent Transactions
+        </h3>
+
+
+        {% if recent_expenses %}
+
+            {% for expense in recent_expenses %}
+
+                <div class="preview-transaction">
+
+                    <div>
+
+                        <strong>
+                            {{
+                                expense.description
+                                if expense.description
+                                else expense.category
+                            }}
+                        </strong>
+
+                        <small>
+                            {{ expense.category }}
+                            ·
+                            {{ expense.expense_date }}
+                        </small>
+
+                    </div>
+
+
+                    <span class="preview-expense-amount">
+                        -₹{{ "{:,.0f}".format(expense.amount|float) }}
+                    </span>
+
+                </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <div class="empty-preview">
+                No transactions added yet.
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</section>
+
+
+
+
+<script
+    src="{{ url_for('static', filename='js/script.js') }}"
+></script>
+
+</body>
+
+</html>

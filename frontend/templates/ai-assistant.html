@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        AI Assistant | Smart Expense Tracker AI
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+</head>
+
+
+<body>
+
+
+<header class="navbar">
+
+    <div class="logo">
+        💰 Smart Expense Tracker AI
+    </div>
+
+
+    <nav class="nav-buttons">
+
+        <a
+            href="{{ url_for('home') }}"
+            class="nav-btn"
+        >
+            🏠 Home
+        </a>
+
+        <a
+            href="{{ url_for('dashboard') }}"
+            class="nav-btn"
+        >
+            📈 Dashboard
+        </a>
+
+        <a
+            href="{{ url_for('reports') }}"
+            class="nav-btn"
+        >
+            📊 Reports
+        </a>
+
+        <a
+            href="{{ url_for('budget') }}"
+            class="nav-btn"
+        >
+            🎯 Budget
+        </a>
+
+        <a
+            href="{{ url_for('logout') }}"
+            class="logout-btn"
+        >
+            🚪 Logout
+        </a>
+
+    </nav>
+
+</header>
+
+
+
+<section class="ai-page">
+
+
+    <!-- ==========================================
+         PAGE HEADING
+    =========================================== -->
+
+    <div class="ai-page-heading">
+
+        <p class="dashboard-label">
+            SMART FINANCIAL ANALYSIS
+        </p>
+
+        <h1>
+            🤖 AI Financial Assistant
+        </h1>
+
+        <p>
+            Personalized insights generated from your
+            income and expense data.
+        </p>
+
+
+        <!-- ==========================================
+             MONTH / YEAR FILTER
+        =========================================== -->
+
+        <form
+            method="GET"
+            action="{{ url_for('ai') }}"
+            class="report-filter-form"
+        >
+
+            <select
+                name="month"
+                id="ai_month"
+            >
+
+                <option
+                    value="1"
+                    {% if selected_month == 1 %}selected{% endif %}
+                >
+                    January
+                </option>
+
+                <option
+                    value="2"
+                    {% if selected_month == 2 %}selected{% endif %}
+                >
+                    February
+                </option>
+
+                <option
+                    value="3"
+                    {% if selected_month == 3 %}selected{% endif %}
+                >
+                    March
+                </option>
+
+                <option
+                    value="4"
+                    {% if selected_month == 4 %}selected{% endif %}
+                >
+                    April
+                </option>
+
+                <option
+                    value="5"
+                    {% if selected_month == 5 %}selected{% endif %}
+                >
+                    May
+                </option>
+
+                <option
+                    value="6"
+                    {% if selected_month == 6 %}selected{% endif %}
+                >
+                    June
+                </option>
+
+                <option
+                    value="7"
+                    {% if selected_month == 7 %}selected{% endif %}
+                >
+                    July
+                </option>
+
+                <option
+                    value="8"
+                    {% if selected_month == 8 %}selected{% endif %}
+                >
+                    August
+                </option>
+
+                <option
+                    value="9"
+                    {% if selected_month == 9 %}selected{% endif %}
+                >
+                    September
+                </option>
+
+                <option
+                    value="10"
+                    {% if selected_month == 10 %}selected{% endif %}
+                >
+                    October
+                </option>
+
+                <option
+                    value="11"
+                    {% if selected_month == 11 %}selected{% endif %}
+                >
+                    November
+                </option>
+
+                <option
+                    value="12"
+                    {% if selected_month == 12 %}selected{% endif %}
+                >
+                    December
+                </option>
+
+            </select>
+
+
+            <select
+                name="year"
+                id="ai_year"
+            >
+
+                {% for year in range(2024, 2031) %}
+
+                    <option
+                        value="{{ year }}"
+                        {% if selected_year == year %}selected{% endif %}
+                    >
+                        {{ year }}
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+
+            <button
+                type="submit"
+                class="ai-primary-btn"
+            >
+                View Month
+            </button>
+
+        </form>
+
+
+        <p>
+            Viewing:
+            <strong>
+                {{ selected_month_name }}
+                {{ selected_year }}
+            </strong>
+        </p>
+
+    </div>
+
+
+
+    <!-- ==========================================
+         AI LAYOUT
+    =========================================== -->
+
+    <div class="ai-assistant-layout">
+
+
+        <!-- ==========================================
+             AI PROFILE
+        =========================================== -->
+
+        <div class="ai-profile-card">
+
+            <div class="ai-profile-icon">
+                🤖
+            </div>
+
+            <h2>
+                Smart Finance AI
+            </h2>
+
+            <p>
+                Analysing your spending patterns and
+                helping you make better financial decisions.
+            </p>
+
+            <div class="ai-status">
+
+                <span></span>
+
+                Analysis Ready
+
+            </div>
+
+        </div>
+
+
+
+        <!-- ==========================================
+             AI INSIGHT
+        =========================================== -->
+
+        <div class="ai-insight-card">
+
+
+            <div class="ai-insight-header">
+
+                <div>
+
+                    <p class="ai-small-label">
+                        CURRENT INSIGHT
+                    </p>
+
+                    <h2>
+                        Smart Spending Recommendation
+                    </h2>
+
+                </div>
+
+
+                <div class="ai-badge">
+                    AI Generated
+                </div>
+
+            </div>
+
+
+
+            <!-- ==========================================
+                 AI RESPONSE
+            =========================================== -->
+
+            <div class="ai-response-box">
+
+                <div class="ai-response-icon">
+                    ✨
+                </div>
+
+
+                <div>
+
+                    <p>
+                        {{ suggestion
+                           | replace('\n', '<br>')
+                           | safe }}
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- ==========================================
+                 ASK AI FORM
+            =========================================== -->
+
+            <form
+                method="POST"
+                action="{{ url_for('ai') }}"
+                class="ai-question-form"
+                id="aiQuestionForm"
+            >
+
+
+                <input
+                    type="hidden"
+                    name="month"
+                    id="ai_question_month"
+                    value="{{ selected_month }}"
+                >
+
+
+                <input
+                    type="hidden"
+                    name="year"
+                    id="ai_question_year"
+                    value="{{ selected_year }}"
+                >
+
+
+                <input
+                    type="text"
+                    name="question"
+                    placeholder="Ask about your expenses, savings or budget..."
+                    value="{{ question or '' }}"
+                    required
+                >
+
+
+                <button
+                    type="submit"
+                    class="ai-primary-btn"
+                >
+                    Ask AI
+                </button>
+
+
+            </form>
+
+
+
+            <!-- ==========================================
+                 ACTION BUTTONS
+            =========================================== -->
+
+            <div class="ai-action-row">
+
+                <a
+                    href="{{ url_for('dashboard') }}"
+                    class="ai-secondary-btn"
+                >
+                    View Dashboard
+                </a>
+
+
+                <a
+                    href="{{ url_for(
+                        'budget',
+                        month=selected_month,
+                        year=selected_year
+                    ) }}"
+                    class="ai-primary-btn"
+                >
+                    Review Budget
+                </a>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- ==========================================
+     KEEP ASK AI MONTH/YEAR IN SYNC
+=========================================== -->
+
+<script>
+
+    const aiMonth =
+        document.getElementById(
+            "ai_month"
+        );
+
+    const aiYear =
+        document.getElementById(
+            "ai_year"
+        );
+
+    const questionMonth =
+        document.getElementById(
+            "ai_question_month"
+        );
+
+    const questionYear =
+        document.getElementById(
+            "ai_question_year"
+        );
+
+    const aiQuestionForm =
+        document.getElementById(
+            "aiQuestionForm"
+        );
+
+
+    function syncAIMonth() {
+
+        if (
+            aiMonth &&
+            questionMonth
+        ) {
+
+            questionMonth.value =
+                aiMonth.value;
+
+        }
+
+
+        if (
+            aiYear &&
+            questionYear
+        ) {
+
+            questionYear.value =
+                aiYear.value;
+
+        }
+
+    }
+
+
+    if (aiMonth) {
+
+        aiMonth.addEventListener(
+            "change",
+            syncAIMonth
+        );
+
+    }
+
+
+    if (aiYear) {
+
+        aiYear.addEventListener(
+            "change",
+            syncAIMonth
+        );
+
+    }
+
+
+    if (aiQuestionForm) {
+
+        aiQuestionForm.addEventListener(
+            "submit",
+            syncAIMonth
+        );
+
+    }
+
+</script>
+
+
+</body>
+
+</html>

@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Dashboard | Smart Expense Tracker AI</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+
+</head>
+
+<body>
+
+    <header class="dashboard-navbar">
+
+        <div class="dashboard-brand">
+
+            <div class="brand-icon">
+                💰
+            </div>
+
+            <div>
+                <h2>Smart Expense Tracker AI</h2>
+                <span>Welcome, {{ fullname }}</span>
+            </div>
+
+        </div>
+
+        <nav class="dashboard-nav">
+
+            <a href="{{ url_for('home') }}" class="nav-btn">
+                🏠 Home
+            </a>
+
+            <a href="{{ url_for('reports') }}" class="nav-btn">
+                📊 Reports
+            </a>
+
+            <a href="{{ url_for('budget') }}" class="nav-btn">
+                🎯 Budget
+            </a>
+
+            <a href="{{ url_for('ai') }}" class="nav-btn">
+                🤖 AI Assistant
+            </a>
+
+            <a href="{{ url_for('logout') }}" class="logout-btn">
+                🚪 Logout
+            </a>
+
+        </nav>
+
+    </header>
+
+
+    <section class="dashboard">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+
+        {% for category, message in messages %}
+
+            <div class="flash-success">
+                {{ message }}
+            </div>
+
+        {% endfor %}
+
+    {% endif %}
+{% endwith %}
+
+        <div class="dashboard-title-row">
+
+            <div>
+
+                <p class="dashboard-label">
+                    FINANCIAL OVERVIEW
+                </p>
+
+                <h1>Dashboard</h1>
+
+                <p class="dashboard-subtitle">
+                    Track your income, expenses and savings in one place.
+                </p>
+
+            </div>
+
+            <div class="dashboard-actions">
+
+                <a href="{{ url_for('add_income_page') }}" class="income-btn">
+                    💰 Add Income
+                </a>
+
+                <a href="{{ url_for('add_expense_page') }}" class="expense-btn">
+                    ➕ Add Expense
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <div class="cards">
+
+            <div class="card">
+
+                <h3>💰 Income</h3>
+
+                <h2>
+                    ₹{{ "{:,.0f}".format(income|float) }}
+                </h2>
+
+            </div>
+
+
+            <div class="card">
+
+                <h3>💸 Expenses</h3>
+
+                <h2>
+                    ₹{{ "{:,.0f}".format(expenses|float) }}
+                </h2>
+
+            </div>
+
+
+            <div class="card">
+
+                <h3>🏦 Savings</h3>
+
+                <h2>
+
+                    {% if savings < 0 %} -₹{{ "{:,.0f}" .format((savings * -1)|float) }} {% else %} ₹{{ "{:,.0f}"
+                        .format(savings|float) }} {% endif %} </h2>
+
+            </div>
+
+
+            <div class="card">
+
+                <h3>📊 Transactions</h3>
+
+                <h2>
+                    {{ total_transactions }}
+                </h2>
+
+            </div>
+
+                </div>
+
+
+        <!-- ==========================================
+             CURRENT MONTH CATEGORY BREAKDOWN
+        =========================================== -->
+
+        <br>
+
+        <div class="card">
+
+            <h2>
+                📅 {{ current_month_name }} {{ current_year }} Spending
+            </h2>
+
+            <p>
+                Total spent this month:
+                <strong>
+                    ₹{{ "{:,.0f}".format(monthly_total_expense|float) }}
+                </strong>
+            </p>
+
+            <br>
+
+            {% if monthly_category_summary %}
+
+                <table class="report-table">
+
+                    <thead>
+
+                        <tr>
+                            <th>Category</th>
+                            <th>Total Spent</th>
+                            <th>Transactions</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        {% for row in monthly_category_summary %}
+
+                            <tr>
+
+                                <td>
+                                    {{ row.category }}
+                                </td>
+
+                                <td>
+                                    ₹{{ "{:,.0f}".format(row.amount|float) }}
+                                </td>
+
+                                <td>
+                                    {{ row.transaction_count }}
+                                </td>
+
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            {% else %}
+
+                <div class="empty-preview">
+                    No expenses recorded for this month.
+                </div>
+
+            {% endif %}
+
+        </div>
+
+
+        <hr>
+
+
+        <h2>📝 Recent Transactions</h2>
+
+        <div class="card">
+
+            {% if recent_income or recent_expenses %}
+
+            {% for income_item in recent_income %}
+
+            <div class="dashboard-transaction">
+
+                <div class="transaction-info">
+
+                    <div class="transaction-icon income-transaction-icon">
+                        💰
+                    </div>
+
+                    <div>
+                        <h4>{{ income_item.source | title }}</h4>
+                        <p>Income</p>
+                        <small>{{ income_item.income_date }}</small>
+                    </div>
+
+                </div>
+
+                <div class="transaction-actions">
+
+                    <span class="dashboard-income-amount">
+                        +₹{{ "{:,.0f}".format(income_item.amount|float) }}
+                    </span>
+                    <a href="{{ url_for('edit_income_page', income_id=income_item.id) }}" class="edit-transaction-btn"
+                        title="Edit income">
+                        ✏️
+                    </a>
+
+                    <form action="{{ url_for('delete_income', income_id=income_item.id) }}" method="POST"
+                        onsubmit="return confirm('Delete this income?');">
+                        <button type="submit" class="delete-transaction-btn" title="Delete income">
+                            🗑
+                        </button>
+                    </form>
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+
+            {% for expense in recent_expenses %}
+
+            <div class="dashboard-transaction">
+
+                <div class="transaction-info">
+
+                    <div class="transaction-icon">
+                        💸
+                    </div>
+
+                    <div>
+                        <h4>{{ expense.category | title }}</h4>
+
+                        <p>
+                            {{ expense.description
+                            if expense.description
+                            else "No description" }}
+                        </p>
+
+                        <small>{{ expense.expense_date }}</small>
+                    </div>
+
+                </div>
+
+                <div class="transaction-actions">
+
+    <span class="dashboard-expense-amount">
+        -₹{{ "{:,.0f}".format(expense.amount|float) }}
+    </span>
+
+    <a
+        href="{{ url_for('edit_expense_page', expense_id=expense.id) }}"
+        class="edit-transaction-btn"
+        title="Edit expense"
+    >
+        ✏️
+    </a>
+
+    <form
+        action="{{ url_for('delete_expense', expense_id=expense.id) }}"
+        method="POST"
+        onsubmit="return confirm('Delete this expense?');"
+    >
+        <button
+            type="submit"
+            class="delete-transaction-btn"
+            title="Delete expense"
+        >
+            🗑
+        </button>
+    </form>
+
+</div>
+
+            </div>
+
+            {% endfor %}
+
+            {% else %}
+
+            <div class="empty-preview">
+                No recent transactions found.
+            </div>
+
+            {% endif %}
+
+        </div>
+
+        <br>
+
+        <h2>🤖 AI Suggestion</h2>
+
+
+        <div class="dashboard-ai-card">
+
+            <div class="dashboard-ai-icon">
+                🤖
+            </div>
+
+            <div class="dashboard-ai-content">
+
+                <h3>
+                    Smart Financial Insight
+                </h3>
+
+                <p>
+                    {{ ai_suggestion }}
+                </p>
+
+                <a href="{{ url_for('ai') }}" class="ai-details-btn">
+                    View Full Analysis
+                </a>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+
+
+</body>
+
+</html>

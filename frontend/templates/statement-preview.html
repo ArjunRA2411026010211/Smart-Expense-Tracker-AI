@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Statement Preview</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+
+<body>
+
+
+    <!-- =========================================
+     NAVBAR
+========================================= -->
+
+    <header class="navbar">
+
+        <div class="logo">
+            💰 Smart Expense Tracker AI
+        </div>
+
+        <nav class="nav-buttons">
+
+            <a href="{{ url_for('home') }}" class="nav-btn">
+                🏠 Home
+            </a>
+
+            <a href="{{ url_for('dashboard') }}" class="nav-btn">
+                📈 Dashboard
+            </a>
+
+            <a href="{{ url_for('reports') }}" class="nav-btn">
+                📊 Reports
+            </a>
+
+            <a href="{{ url_for('upload_statement_page') }}" class="nav-btn">
+                🏦 Import
+            </a>
+
+            <a href="{{ url_for('logout') }}" class="logout-btn">
+                🚪 Logout
+            </a>
+
+        </nav>
+
+    </header>
+
+
+
+    <!-- =========================================
+     STATEMENT PREVIEW
+========================================= -->
+
+    <section class="dashboard">
+
+        <h1>
+            📄 Statement Preview
+        </h1>
+
+        <p class="dashboard-subtitle">
+            Review the detected transactions and categories
+            before importing them.
+        </p>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+
+    {% if messages %}
+
+        {% for category, message in messages %}
+
+            <div class="flash-message {{ category }}">
+                {{ message }}
+            </div>
+
+        {% endfor %}
+
+    {% endif %}
+
+{% endwith %}
+
+
+        <!-- =====================================
+         PREVIEW CARD
+    ====================================== -->
+
+        <div class="card">
+
+            <div style="overflow-x: auto;">
+
+
+                <!-- =================================
+                 IMPORT FORM
+            ================================== -->
+
+                <form action="{{ url_for('import_statement_transactions') }}" method="POST">
+
+
+                    <!-- Number of transactions -->
+
+                    <input type="hidden" name="transaction_count" value="{{ transactions|length }}">
+
+
+                    <!-- =============================
+                     TRANSACTION TABLE
+                ============================== -->
+
+                    <table class="statement-preview-table">
+
+
+                        <thead>
+
+                            <tr>
+
+                                <th>Date</th>
+
+                                <th>
+                                    Description / Merchant
+                                </th>
+
+                                <th>Amount</th>
+
+                                <th>Type</th>
+
+                                <th>AI Category</th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+
+                            {% for transaction in transactions %}
+
+
+                            <tr>
+
+
+                                <!-- =====================
+                                 DATE
+                            ====================== -->
+
+                                <td>
+
+                                    {{ transaction["date"] }}
+
+
+                                    <!-- Hidden transaction information -->
+
+                                    <input type="hidden" name="date_{{ loop.index0 }}"
+                                        value="{{ transaction['date'] }}">
+
+                                    <input type="hidden" name="description_{{ loop.index0 }}"
+                                        value="{{ transaction['description'] }}">
+
+                                    <input type="hidden" name="amount_{{ loop.index0 }}"
+                                        value="{{ transaction['amount'] }}">
+
+                                    <input type="hidden" name="type_{{ loop.index0 }}"
+                                        value="{{ transaction['type'] }}">
+
+                                </td>
+
+
+
+                                <!-- =====================
+                                 DESCRIPTION
+                            ====================== -->
+
+                                <td>
+
+                                    {{ transaction["description"] }}
+
+                                </td>
+
+
+
+                                <!-- =====================
+                                 AMOUNT
+                            ====================== -->
+
+                                <td>
+
+                                    ₹{{ transaction["amount"] }}
+
+                                </td>
+
+
+
+                                <!-- =====================
+                                 TRANSACTION TYPE
+                            ====================== -->
+
+                                <td>
+
+
+                                    {% if transaction["type"]|lower in ["credit", "cr"] %}
+
+
+                                    <span class="dashboard-income-amount">
+
+                                        Credit
+
+                                    </span>
+
+
+                                    {% else %}
+
+
+                                    <span class="dashboard-expense-amount">
+
+                                        Debit
+
+                                    </span>
+
+
+                                    {% endif %}
+
+
+                                </td>
+
+
+
+                                <!-- =====================
+                                 AI CATEGORY
+                            ====================== -->
+
+                                <td>
+
+                                    <select class="statement-category-select" name="category_{{ loop.index0 }}">
+
+                                        <option value="Food" {% if transaction["category"]=="Food" %}selected{% endif
+                                            %}>
+                                            🍔 Food
+                                        </option>
+
+                                        <option value="Groceries" {% if transaction["category"]=="Groceries"
+                                            %}selected{% endif %}>
+                                            🛒 Groceries
+                                        </option>
+
+                                        <option value="Petrol" {% if transaction["category"]=="Petrol" %}selected{%
+                                            endif %}>
+                                            ⛽ Petrol
+                                        </option>
+
+                                        <option value="Shopping" {% if transaction["category"]=="Shopping" %}selected{%
+                                            endif %}>
+                                            🛍️ Shopping
+                                        </option>
+
+                                        <option value="Studies" {% if transaction["category"]=="Studies" %}selected{%
+                                            endif %}>
+                                            🎓 Studies
+                                        </option>
+
+                                        <option value="Rent" {% if transaction["category"]=="Rent" %}selected{% endif
+                                            %}>
+                                            🏠 Rent
+                                        </option>
+
+                                        <option value="Transport" {% if transaction["category"]=="Transport"
+                                            %}selected{% endif %}>
+                                            🚕 Transport
+                                        </option>
+
+                                        <option value="Bills" {% if transaction["category"]=="Bills" %}selected{% endif
+                                            %}>
+                                            🧾 Bills
+                                        </option>
+
+                                        <option value="Medical" {% if transaction["category"]=="Medical" %}selected{%
+                                            endif %}>
+                                            💊 Medical
+                                        </option>
+
+                                        <option value="Entertainment" {% if transaction["category"]=="Entertainment"
+                                            %}selected{% endif %}>
+                                            🎬 Entertainment
+                                        </option>
+
+                                        <option value="EMI" {% if transaction["category"]=="EMI" %}selected{% endif %}>
+                                            🏦 EMI
+                                        </option>
+
+                                        <option value="Investment" {% if transaction["category"]=="Investment"
+                                            %}selected{% endif %}>
+                                            📈 Investment
+                                        </option>
+
+                                        <option value="Personal Transfer" {% if
+                                            transaction["category"]=="Personal Transfer" %}selected{% endif %}>
+                                            👤 Personal Transfer
+                                        </option>
+
+                                        <option value="Salary" {% if transaction["category"]=="Salary" %}selected{%
+                                            endif %}>
+                                            💰 Salary
+                                        </option>
+
+                                        <option value="Income" {% if transaction["category"]=="Income" %}selected{%
+                                            endif %}>
+                                            💵 Income
+                                        </option>
+
+                                        <option value="Other" {% if transaction["category"]=="Other" %}selected{% endif
+                                            %}>
+                                            📦 Other
+                                        </option>
+
+                                    </select>
+
+
+                                </td>
+
+
+                            </tr>
+
+
+                            {% endfor %}
+
+
+                        </tbody>
+
+
+                    </table>
+
+
+
+                    <!-- =================================
+                     CONFIRM IMPORT BUTTON
+                ================================== -->
+
+                    <br><br>
+
+
+                    <button type="submit" class="expense-btn">
+
+                        ✅ Confirm & Import Transactions
+
+                    </button>
+
+
+                </form>
+
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =========================================
+         UPLOAD ANOTHER STATEMENT
+    ========================================== -->
+
+        <br>
+
+
+        <a href="{{ url_for('upload_statement_page') }}" class="btn-secondary">
+
+            ← Upload Another Statement
+
+        </a>
+
+
+    </section>
+
+
+
+    <!-- =========================================
+     JAVASCRIPT
+========================================= -->
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+
+</body>
+
+</html>

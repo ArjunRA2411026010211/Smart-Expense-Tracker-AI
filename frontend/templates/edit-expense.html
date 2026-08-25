@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Edit Expense</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+</head>
+
+<body>
+
+<header class="navbar">
+
+    <div class="logo">
+        💰 Smart Expense Tracker AI
+    </div>
+
+    <nav class="nav-buttons">
+
+        <a href="{{ url_for('dashboard') }}" class="nav-btn">
+            📈 Dashboard
+        </a>
+
+        <a href="{{ url_for('reports') }}" class="nav-btn">
+            📊 Reports
+        </a>
+
+        <a href="{{ url_for('budget') }}" class="nav-btn">
+            🎯 Budget
+        </a>
+
+        <a href="{{ url_for('logout') }}" class="logout-btn">
+            🚪 Logout
+        </a>
+
+    </nav>
+
+</header>
+
+<section class="dashboard">
+
+    <div class="form-container">
+
+        <h1>✏️ Edit Expense</h1>
+
+        <form action="{{ url_for('update_expense', expense_id=expense.id) }}" method="POST">
+
+            <div class="cards">
+
+                <div class="card">
+                    <h3>📂 Category</h3>
+                    <input
+                        type="text"
+                        name="category"
+                        value="{{ expense.category }}"
+                        required
+                    >
+                </div>
+
+                <div class="card">
+                    <h3>💰 Amount</h3>
+                    <input
+                        type="number"
+                        name="amount"
+                        value="{{ expense.amount }}"
+                        required
+                    >
+                </div>
+
+                <div class="card">
+                    <h3>📝 Description</h3>
+                    <input
+                        type="text"
+                        name="description"
+                        value="{{ expense.description }}"
+                    >
+                </div>
+
+                <div class="card">
+                    <h3>📅 Expense Date</h3>
+                    <input
+                        type="date"
+                        name="expense_date"
+                        value="{{ expense.expense_date }}"
+                        required
+                    >
+                </div>
+
+            </div>
+
+            <br>
+
+            <button class="btn-primary" type="submit">
+                💾 Update Expense
+            </button>
+
+            <a href="{{ url_for('dashboard') }}" class="btn-secondary">
+                ← Cancel
+            </a>
+
+        </form>
+
+    </div>
+
+</section>
+
+</body>
+
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Edit Income</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+</head>
+
+<body>
+
+<header class="navbar">
+
+    <div class="logo">
+        💰 Smart Expense Tracker AI
+    </div>
+
+    <nav class="nav-buttons">
+
+        <a href="{{ url_for('dashboard') }}" class="nav-btn">
+            📈 Dashboard
+        </a>
+
+        <a href="{{ url_for('reports') }}" class="nav-btn">
+            📊 Reports
+        </a>
+
+        <a href="{{ url_for('budget') }}" class="nav-btn">
+            🎯 Budget
+        </a>
+
+        <a href="{{ url_for('ai') }}" class="nav-btn">
+            🤖 AI Assistant
+        </a>
+
+        <a href="{{ url_for('logout') }}" class="logout-btn">
+            🚪 Logout
+        </a>
+
+    </nav>
+
+</header>
+
+<section class="dashboard">
+
+    <div class="form-container">
+
+        <h1>✏️ Edit Income</h1>
+
+        <form
+            action="{{ url_for('update_income', income_id=income_item.id) }}"
+            method="POST"
+        >
+
+            <div class="cards">
+
+                <div class="card">
+
+                    <h3>💼 Income Source</h3>
+
+                    <input
+                        type="text"
+                        name="source"
+                        value="{{ income_item.source }}"
+                        required
+                    >
+
+                </div>
+
+                <div class="card">
+
+                    <h3>💰 Amount</h3>
+
+                    <input
+                        type="number"
+                        name="amount"
+                        value="{{ income_item.amount }}"
+                        min="0.01"
+                        step="0.01"
+                        required
+                    >
+
+                </div>
+
+                <div class="card">
+
+                    <h3>📅 Income Date</h3>
+
+                    <input
+                        type="date"
+                        name="income_date"
+                        value="{{ income_item.income_date }}"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+            <br>
+
+            <button type="submit" class="btn-primary">
+                💾 Update Income
+            </button>
+
+            <a href="{{ url_for('dashboard') }}" class="btn-secondary">
+                ← Cancel
+            </a>
+
+        </form>
+
+    </div>
+
+</section>
+
+</body>
+
+</html>

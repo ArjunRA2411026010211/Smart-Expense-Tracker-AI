@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Budget Planner</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+
+<body>
+
+
+    <header class="navbar">
+
+        <div class="logo">
+            💰 Smart Expense Tracker AI
+        </div>
+
+
+        <nav class="nav-buttons">
+
+            <a href="{{ url_for('home') }}" class="nav-btn">
+                🏠 Home
+            </a>
+
+            <a href="{{ url_for('dashboard') }}" class="nav-btn">
+                📈 Dashboard
+            </a>
+
+            <a href="{{ url_for('reports') }}" class="nav-btn">
+                📊 Reports
+            </a>
+
+            <a href="{{ url_for('ai') }}" class="nav-btn">
+                🤖 AI Assistant
+            </a>
+
+            <a href="{{ url_for('logout') }}" class="logout-btn">
+                🚪 Logout
+            </a>
+
+        </nav>
+
+    </header>
+
+
+
+    <section class="dashboard">
+
+
+        <!-- ==========================================
+         FLASH MESSAGES
+    =========================================== -->
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+
+        {% if messages %}
+
+        {% for category, message in messages %}
+
+        <div class="flash-success">
+            {{ message }}
+        </div>
+
+        {% endfor %}
+
+        {% endif %}
+
+        {% endwith %}
+
+
+
+        <!-- ==========================================
+         MONTH / YEAR SELECTOR
+    =========================================== -->
+
+        <div class="card">
+
+            <h2>
+                📅 Budget Month
+            </h2>
+
+
+            <form method="GET" action="{{ url_for('budget') }}" class="report-filter-form">
+
+                <label for="month">
+                    Month
+                </label>
+
+
+                <select name="month" id="month" required>
+
+                    <option value="1" {% if selected_month==1 %}selected{% endif %}>
+                        January
+                    </option>
+
+                    <option value="2" {% if selected_month==2 %}selected{% endif %}>
+                        February
+                    </option>
+
+                    <option value="3" {% if selected_month==3 %}selected{% endif %}>
+                        March
+                    </option>
+
+                    <option value="4" {% if selected_month==4 %}selected{% endif %}>
+                        April
+                    </option>
+
+                    <option value="5" {% if selected_month==5 %}selected{% endif %}>
+                        May
+                    </option>
+
+                    <option value="6" {% if selected_month==6 %}selected{% endif %}>
+                        June
+                    </option>
+
+                    <option value="7" {% if selected_month==7 %}selected{% endif %}>
+                        July
+                    </option>
+
+                    <option value="8" {% if selected_month==8 %}selected{% endif %}>
+                        August
+                    </option>
+
+                    <option value="9" {% if selected_month==9 %}selected{% endif %}>
+                        September
+                    </option>
+
+                    <option value="10" {% if selected_month==10 %}selected{% endif %}>
+                        October
+                    </option>
+
+                    <option value="11" {% if selected_month==11 %}selected{% endif %}>
+                        November
+                    </option>
+
+                    <option value="12" {% if selected_month==12 %}selected{% endif %}>
+                        December
+                    </option>
+
+                </select>
+
+
+
+                <label for="year">
+                    Year
+                </label>
+
+
+                <select name="year" id="year" required>
+
+                    {% for year in range(2024, 2031) %}
+
+                    <option value="{{ year }}" {% if selected_year==year %}selected{% endif %}>
+                        {{ year }}
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+
+
+
+                <button type="submit" class="btn-primary">
+                    📊 View Budget
+                </button>
+
+            </form>
+
+        </div>
+
+
+
+        <br>
+
+
+
+        <!-- ==========================================
+         PAGE TITLE
+    =========================================== -->
+
+        <h2>
+            {{ selected_month_name }}
+            {{ selected_year }}
+            Budget Overview
+        </h2>
+
+
+        <h1>
+            🎯 Budget Planner
+        </h1>
+
+
+
+        <!-- ==========================================
+         MAIN BUDGET FORM
+    =========================================== -->
+
+        <form action="{{ url_for('save_budget') }}" method="POST">
+
+
+            <input type="hidden" name="selected_month" id="selected_month" value="{{ selected_month }}">
+
+            <input type="hidden" name="selected_year" id="selected_year" value="{{ selected_year }}">
+
+
+
+            <div class="cards">
+
+
+                <!-- FOOD -->
+
+                <div class="card">
+
+                    <h3>
+                        🍔 Food Budget
+                    </h3>
+
+                    <input type="number" name="food_budget" placeholder="Enter Food Budget" min="0" step="0.01">
+
+                </div>
+
+
+
+                <!-- PETROL -->
+
+                <div class="card">
+
+                    <h3>
+                        ⛽ Petrol Budget
+                    </h3>
+
+                    <input type="number" name="petrol_budget" placeholder="Enter Petrol Budget" min="0" step="0.01">
+
+                </div>
+
+
+
+                <!-- STUDIES -->
+
+                <div class="card">
+
+                    <h3>
+                        📚 Studies Budget
+                    </h3>
+
+                    <input type="number" name="studies_budget" placeholder="Enter Studies Budget" min="0" step="0.01">
+
+                </div>
+
+
+
+                <!-- RENT -->
+
+                <div class="card">
+
+                    <h3>
+                        🏠 Rent Budget
+                    </h3>
+
+                    <input type="number" name="rent_budget" placeholder="Enter Rent Budget" min="0" step="0.01">
+
+                </div>
+
+            </div>
+
+
+
+            <br>
+
+
+            <button type="submit" class="btn-primary">
+                💾 Save Budget
+            </button>
+
+
+        </form>
+
+
+
+        <br>
+
+
+
+        <!-- ==========================================
+         CUSTOM BUDGET
+    =========================================== -->
+
+        <div class="custom-budget-card">
+
+            <h2>
+                ➕ Add Custom Budget
+            </h2>
+
+
+            <form action="{{ url_for('add_custom_budget') }}" method="POST" class="custom-budget-form">
+
+
+                <input type="hidden" name="selected_month" value="{{ selected_month }}">
+
+
+                <input type="hidden" name="selected_year" value="{{ selected_year }}">
+
+
+                <input type="text" name="category" placeholder="Category (e.g. Shopping)" required>
+
+
+                <input type="number" name="budget_amount" placeholder="Budget Amount" min="1" step="0.01" required>
+
+
+                <button type="submit" class="btn-primary">
+                    ➕ Add Budget
+                </button>
+
+
+            </form>
+
+        </div>
+
+
+
+        <hr>
+
+
+
+        <!-- ==========================================
+         SAVED BUDGETS
+    =========================================== -->
+
+        <h2 class="budget-section-title">
+
+            Saved Budget -
+            {{ selected_month_name }}
+            {{ selected_year }}
+
+        </h2>
+
+
+
+        <div class="budget-grid">
+
+
+            {% if budget_details %}
+
+
+            {% for item in budget_details %}
+
+
+            <div class="budget-status-card">
+
+
+                <!-- HEADER -->
+
+                <div class="budget-card-header">
+
+                    <h3>
+                        {{ item.category | title }}
+                    </h3>
+
+
+                    {% if item.exceeded %}
+
+                    <span class="budget-alert">
+                        Exceeded
+                    </span>
+
+                    {% else %}
+
+                    <span class="budget-safe">
+                        On Track
+                    </span>
+
+                    {% endif %}
+
+                </div>
+
+
+
+                <!-- VALUES -->
+
+                <div class="budget-values">
+
+
+                    <div>
+
+                        <span>
+                            Budget
+                        </span>
+
+                        <strong>
+
+                            ₹{{ "{:,.0f}".format(
+                            item.budget|float
+                            ) }}
+
+                        </strong>
+
+                    </div>
+
+
+
+                    <div>
+
+                        <span>
+                            Spent
+                        </span>
+
+                        <strong>
+
+                            ₹{{ "{:,.0f}".format(
+                            item.spent|float
+                            ) }}
+
+                        </strong>
+
+                    </div>
+
+
+
+                    <div>
+
+                        <span>
+                            Remaining
+                        </span>
+
+
+                        <strong class="
+                                    {% if item.remaining < 0 %}
+                                        negative-value
+                                    {% endif %}
+                                ">
+
+                            {% if item.remaining < 0 %} -₹{{ "{:,.0f}" .format( (item.remaining * -1)|float ) }} {% else
+                                %} ₹{{ "{:,.0f}" .format( item.remaining|float ) }} {% endif %} </strong>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- PROGRESS BAR -->
+
+                <div class="budget-progress">
+
+                    <div class="
+                                budget-progress-fill
+
+                                {% if item.exceeded %}
+                                    budget-progress-danger
+                                {% endif %}
+                            " style="
+                                width:
+                                {{ item.progress_width
+                                   | default(item.percentage) }}%;
+                            ">
+                    </div>
+
+                </div>
+
+
+
+                <p class="budget-percentage">
+
+                    {{ "{:.0f}".format(
+                    item.percentage|float
+                    ) }}% used
+
+                </p>
+
+
+
+                <!-- EXCEEDED WARNING -->
+
+                {% if item.exceeded %}
+
+                <p class="budget-warning">
+
+                    ⚠ Budget exceeded by
+
+                    ₹{{ "{:,.0f}".format(
+                    (item.spent - item.budget)|float
+                    ) }}
+
+                </p>
+
+                {% endif %}
+
+
+
+                <!-- DELETE -->
+
+                <form action="{{ url_for(
+                            'delete_budget',
+                            category=item.category
+                        ) }}" method="POST" onsubmit="
+                            return confirm(
+                                'Delete this budget?'
+                            );
+                        ">
+
+
+                    <input type="hidden" name="selected_month" value="{{ selected_month }}">
+
+
+                    <input type="hidden" name="selected_year" value="{{ selected_year }}">
+
+
+                    <button type="submit" class="delete-budget-btn">
+                        🗑 Delete
+                    </button>
+
+
+                </form>
+
+
+            </div>
+
+
+            {% endfor %}
+
+
+            {% else %}
+
+
+            <div class="card">
+
+                <p>
+                    No budget saved for
+                    {{ selected_month_name }}
+                    {{ selected_year }}.
+                </p>
+
+            </div>
+
+
+            {% endif %}
+
+
+        </div>
+
+
+    </section>
+
+
+
+    <script src="{{ url_for('static', filename='js/script.js') }}">
+    </script>
+    <script>
+
+const monthSelect = document.getElementById("month");
+const yearSelect = document.getElementById("year");
+
+const selectedMonthInput =
+    document.getElementById("selected_month");
+
+const selectedYearInput =
+    document.getElementById("selected_year");
+
+monthSelect.addEventListener(
+    "change",
+    function () {
+
+        selectedMonthInput.value =
+            monthSelect.value;
+
+    }
+);
+
+yearSelect.addEventListener(
+    "change",
+    function () {
+
+        selectedYearInput.value =
+            yearSelect.value;
+
+    }
+);
+
+</script>
+
+
+</body>
+
+</html>

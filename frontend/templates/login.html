@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Smart Expense Tracker AI</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+    <div class="login-container">
+
+        <div class="login-box">
+
+            <h1>Welcome Back 👋</h1>
+
+            <p>Login to continue</p>
+
+            <form action="/login" method="POST" autocomplete="off">
+
+    <input
+    type="email"
+    name="email"
+    placeholder="Enter Email"
+    autocomplete="off"
+    required>
+
+    <input
+    type="password"
+    name="password"
+    placeholder="Enter Password"
+    autocomplete="new-password"
+    required>
+
+    <button type="submit">
+        Login
+    </button>
+    {% if error %}
+<p style="color:red;">{{ error }}</p>
+{% endif %}
+
+
+</form>
+
+            <a href="{{ url_for('forgot') }}">Forgot Password?</a>
+
+            <p>
+                Don't have an account?
+                <a href="{{ url_for('signup') }}">Create Account</a>
+            </p>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>

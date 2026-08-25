@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Upload Bank Statement</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+</head>
+
+<body>
+
+<header class="navbar">
+
+    <div class="logo">
+        💰 Smart Expense Tracker AI
+    </div>
+
+    <nav class="nav-buttons">
+
+        <a href="{{ url_for('home') }}" class="nav-btn">
+            🏠 Home
+        </a>
+
+        <a href="{{ url_for('dashboard') }}" class="nav-btn">
+            📈 Dashboard
+        </a>
+
+        <a href="{{ url_for('reports') }}" class="nav-btn">
+            📊 Reports
+        </a>
+
+        <a href="{{ url_for('budget') }}" class="nav-btn">
+            🎯 Budget
+        </a>
+
+        <a href="{{ url_for('logout') }}" class="logout-btn">
+            🚪 Logout
+        </a>
+
+    </nav>
+
+</header>
+{% with messages = get_flashed_messages(with_categories=true) %}
+
+    {% if messages %}
+
+        {% for category, message in messages %}
+
+            <div class="flash-message {{ category }}">
+                {{ message }}
+            </div>
+
+        {% endfor %}
+
+    {% endif %}
+
+{% endwith %}
+
+<section class="dashboard">
+
+    <h1>🏦 Import Bank Statement</h1>
+
+    <div class="card">
+
+        <h3>Upload CSV Statement</h3>
+
+        <p>
+            Upload your bank statement in CSV format.
+            Transactions will be previewed before saving.
+        </p>
+
+        <form
+            action="{{ url_for('preview_statement') }}"
+            method="POST"
+            enctype="multipart/form-data"
+        >
+
+            <input
+                type="file"
+                name="statement_file"
+                accept=".csv,.xlsx,.pdf"
+                required
+            >
+
+            <br><br>
+
+            <button type="submit" class="btn-primary">
+                📤 Upload & Preview
+            </button>
+
+        </form>
+
+    </div>
+
+</section>
+
+</body>
+
+</html>

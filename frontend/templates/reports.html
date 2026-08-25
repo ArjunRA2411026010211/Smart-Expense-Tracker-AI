@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Reports</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+</head>
+
+<body>
+
+<header class="navbar">
+
+    <div class="logo">
+        💰 Smart Expense Tracker AI
+    </div>
+
+    <nav class="nav-buttons">
+
+        <a href="{{ url_for('home') }}" class="nav-btn">
+            🏠 Home
+        </a>
+
+        <a href="{{ url_for('dashboard') }}" class="nav-btn">
+            📈 Dashboard
+        </a>
+
+        <a href="{{ url_for('budget') }}" class="nav-btn">
+            🎯 Budget
+        </a>
+
+        <a href="{{ url_for('ai') }}" class="nav-btn">
+            🤖 AI Assistant
+        </a>
+
+        <a href="{{ url_for('logout') }}" class="logout-btn">
+            🚪 Logout
+        </a>
+
+    </nav>
+
+</header>
+
+
+<section class="dashboard">
+
+    <h1>
+        📊 Expense Reports
+    </h1>
+
+
+    <!-- ==========================================
+         MONTH / YEAR FILTER
+    =========================================== -->
+
+    <div class="card">
+
+        <h2>
+            Monthly Spending Report
+        </h2>
+
+        <form
+            method="GET"
+            action="{{ url_for('reports') }}"
+            class="report-filter-form"
+        >
+
+            <label for="month">
+                Month
+            </label>
+
+            <select
+                name="month"
+                id="month"
+                required
+            >
+
+                <option value="1"
+                    {% if selected_month == 1 %}selected{% endif %}>
+                    January
+                </option>
+
+                <option value="2"
+                    {% if selected_month == 2 %}selected{% endif %}>
+                    February
+                </option>
+
+                <option value="3"
+                    {% if selected_month == 3 %}selected{% endif %}>
+                    March
+                </option>
+
+                <option value="4"
+                    {% if selected_month == 4 %}selected{% endif %}>
+                    April
+                </option>
+
+                <option value="5"
+                    {% if selected_month == 5 %}selected{% endif %}>
+                    May
+                </option>
+
+                <option value="6"
+                    {% if selected_month == 6 %}selected{% endif %}>
+                    June
+                </option>
+
+                <option value="7"
+                    {% if selected_month == 7 %}selected{% endif %}>
+                    July
+                </option>
+
+                <option value="8"
+                    {% if selected_month == 8 %}selected{% endif %}>
+                    August
+                </option>
+
+                <option value="9"
+                    {% if selected_month == 9 %}selected{% endif %}>
+                    September
+                </option>
+
+                <option value="10"
+                    {% if selected_month == 10 %}selected{% endif %}>
+                    October
+                </option>
+
+                <option value="11"
+                    {% if selected_month == 11 %}selected{% endif %}>
+                    November
+                </option>
+
+                <option value="12"
+                    {% if selected_month == 12 %}selected{% endif %}>
+                    December
+                </option>
+
+            </select>
+
+
+            <label for="year">
+                Year
+            </label>
+
+            <select
+                name="year"
+                id="year"
+                required
+            >
+
+                {% for year in range(2024, 2031) %}
+
+                    <option
+                        value="{{ year }}"
+                        {% if selected_year == year %}selected{% endif %}
+                    >
+                        {{ year }}
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+
+            <button
+                type="submit"
+                class="download-report-btn"
+            >
+                📊 View Report
+            </button>
+
+        </form>
+
+    </div>
+
+
+    <br>
+
+
+    <!-- ==========================================
+         SELECTED MONTH
+    =========================================== -->
+
+    <div class="card">
+
+        <h2>
+            {{ selected_month_name }}
+            {{ selected_year }}
+            Spending Summary
+        </h2>
+
+        <p>
+            Total expense transactions:
+            <strong>
+                {{ monthly_transaction_count }}
+            </strong>
+        </p>
+
+    </div>
+
+
+    <br>
+
+
+    <!-- ==========================================
+         DOWNLOAD
+    =========================================== -->
+
+    <div class="report-actions">
+
+        <a
+    href="{{ url_for(
+        'download_report',
+        month=selected_month,
+        year=selected_year
+    ) }}"
+    class="download-report-btn"
+>
+    📄 Download {{ selected_month_name }} {{ selected_year }} Report
+</a>
+
+    </div>
+
+
+    <br>
+
+
+    <!-- ==========================================
+         SUMMARY CARDS
+    =========================================== -->
+
+    <div class="report-summary-cards">
+
+        <div class="report-summary-card">
+
+            <span>
+                Total Expense
+            </span>
+
+            <h2>
+                ₹{{ "{:,.0f}".format(
+                    total_report_expense|float
+                ) }}
+            </h2>
+
+        </div>
+
+
+        <div class="report-summary-card">
+
+            <span>
+                Top Category
+            </span>
+
+            <h2>
+                {{ top_category }}
+            </h2>
+
+        </div>
+
+
+        <div class="report-summary-card">
+
+            <span>
+                Top Category Spending
+            </span>
+
+            <h2>
+                ₹{{ "{:,.0f}".format(
+                    top_category_amount|float
+                ) }}
+            </h2>
+
+        </div>
+
+    </div>
+
+
+    <br>
+
+
+    <!-- ==========================================
+         CHART
+    =========================================== -->
+
+    <div class="card">
+
+        <h2>
+            Spending Distribution
+        </h2>
+
+        {% if values %}
+
+            <div class="report-chart-wrapper">
+
+                <canvas id="expenseChart"></canvas>
+
+            </div>
+
+        {% else %}
+
+            <p>
+                No expense data found for
+                {{ selected_month_name }}
+                {{ selected_year }}.
+            </p>
+
+        {% endif %}
+
+    </div>
+
+
+    <br>
+
+
+    <!-- ==========================================
+         CATEGORY SUMMARY
+    =========================================== -->
+
+    <div class="card">
+
+        <h2>
+            Category Summary
+        </h2>
+
+        {% if category_summary %}
+
+            <table class="report-table">
+
+                <thead>
+
+                   <tr>
+    <th>Category</th>
+    <th>Amount</th>
+    <th>Transactions</th>
+    <th>Percentage</th>
+</tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for row in category_summary %}
+
+                        <tr>
+
+                            <td>
+                                {{ row.category }}
+                            </td>
+
+                            <td>
+                                ₹{{ "{:,.0f}".format(
+                                    row.amount|float
+                                ) }}
+                            </td>
+                            <td>
+    {{ row.transaction_count }}
+</td>
+
+                            <td>
+                                {{ "%.1f"|format(
+                                    row.percentage
+                                ) }}%
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        {% else %}
+
+            <p>
+                No category spending found for this month.
+            </p>
+
+        {% endif %}
+
+    </div>
+
+</section>
+
+
+<!-- ==========================================
+     PASS FLASK DATA TO JAVASCRIPT
+=========================================== -->
+
+{% if values %}
+
+<script type="application/json" id="chart-labels">
+    {{ labels | tojson }}
+</script>
+
+<script type="application/json" id="chart-values">
+    {{ values | tojson }}
+</script>
+
+<script>
+
+    const labels = JSON.parse(
+        document.getElementById(
+            "chart-labels"
+        ).textContent
+    );
+
+    const values = JSON.parse(
+        document.getElementById(
+            "chart-values"
+        ).textContent
+    );
+
+    const canvas =
+        document.getElementById(
+            "expenseChart"
+        );
+
+    if (canvas) {
+
+        Chart.register(
+            ChartDataLabels
+        );
+
+        new Chart(
+            canvas,
+            {
+
+                type: "pie",
+
+                data: {
+
+                    labels: labels,
+
+                    datasets: [
+
+                        {
+
+                            label:
+                                "Expenses",
+
+                            data:
+                                values,
+
+                            backgroundColor: [
+
+                                "#4F46E5",
+                                "#06B6D4",
+                                "#10B981",
+                                "#F59E0B",
+                                "#EF4444",
+                                "#8B5CF6",
+                                "#EC4899",
+                                "#14B8A6",
+                                "#F97316",
+                                "#84CC16",
+                                "#6366F1",
+                                "#A855F7",
+                                "#22C55E",
+                                "#EAB308",
+                                "#0EA5E9",
+                                "#F43F5E"
+
+                            ],
+
+                            borderColor:
+                                "#ffffff",
+
+                            borderWidth:
+                                2
+
+                        }
+
+                    ]
+
+                },
+
+                options: {
+
+                    responsive:
+                        true,
+
+                    maintainAspectRatio:
+                        false,
+
+                    plugins: {
+
+                        legend: {
+
+                            position:
+                                "bottom"
+
+                        },
+
+                        datalabels: {
+
+                            color:
+                                "#ffffff",
+
+                            font: {
+
+                                weight:
+                                    "bold",
+
+                                size:
+                                    13
+
+                            },
+
+                            formatter: function(
+                                value,
+                                context
+                            ) {
+
+                                const data =
+                                    context
+                                    .chart
+                                    .data
+                                    .datasets[0]
+                                    .data;
+
+                                const total =
+                                    data.reduce(
+                                        function(a, b) {
+                                            return a + b;
+                                        },
+                                        0
+                                    );
+
+                                if (total === 0) {
+                                    return "";
+                                }
+
+                                const percentage =
+                                    (
+                                        value
+                                        / total
+                                    )
+                                    * 100;
+
+                                if (
+                                    percentage < 3
+                                ) {
+                                    return "";
+                                }
+
+                                return (
+                                    percentage
+                                    .toFixed(1)
+                                    + "%"
+                                );
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+        );
+
+    }
+
+</script>
+
+{% endif %}
+
+
+</body>
+
+</html>
